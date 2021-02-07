@@ -6,6 +6,7 @@ namespace PavelIvankov\CustomDeliveryDate\Plugin;
 use Magento\Sales\Api\Data\OrderExtensionFactory;
 use Magento\Framework\Exception\NoSuchEntityException;
 use PavelIvankov\CustomDeliveryDate\Model\CustomDeliveryAttributeFactory;
+use PavelIvankov\CustomDeliveryDate\Api\CustomDeliveryAttributeRepositoryInterface;
 
 class OrderGet
 {
@@ -19,12 +20,19 @@ class OrderGet
      */
     protected $customDeliveryAttributeFactory;
 
+    /**
+     * @var CustomDeliveryAttributeRepositoryInterface
+     */
+    protected $customDeliveryAttributeRepository;
+
     public function __construct(
         OrderExtensionFactory $orderExtensionFactory,
-        CustomDeliveryAttributeFactory $customDeliveryAttributeFactory
+        CustomDeliveryAttributeFactory $customDeliveryAttributeFactory,
+        CustomDeliveryAttributeRepositoryInterface $customDeliveryAttributeRepository
     ) {
         $this->orderExtensionFactory = $orderExtensionFactory;
         $this->customDeliveryAttributeFactory = $customDeliveryAttributeFactory;
+        $this->customDeliveryAttributeRepository = $customDeliveryAttributeRepository;
     }
     public function afterGet(
         \Magento\Sales\Api\OrderRepositoryInterface $subject,
@@ -39,8 +47,7 @@ class OrderGet
     {
 
         try {
-//            $tigrenAttributeValue = $this->tigrenExampleRepository->get($order->getEntityId());
-            $customDeliveryDateAttributeValue = '2021-02-09 20:20:20';
+            $customDeliveryDateAttributeValue = $this->customDeliveryAttributeRepository->getValue($order->getEntityId());
         } catch (NoSuchEntityException $e) {
             return $order;
         }

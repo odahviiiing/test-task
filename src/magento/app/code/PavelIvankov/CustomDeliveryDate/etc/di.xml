@@ -1,7 +1,23 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="PavelIvankov\CustomDeliveryDate\Api\CustomDeliveryAttributeRepositoryInterface"
+                type="PavelIvankov\CustomDeliveryDate\Model\CustomDeliveryAttributeRepository"/>
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
-<!--        <plugin name="save_custom_delivery_date_attribute" type="PavelIvankov\CustomDeliveryDate\Plugin\OrderSave"/>-->
+        <plugin name="save_custom_delivery_date_attribute" type="PavelIvankov\CustomDeliveryDate\Plugin\OrderSave"/>
         <plugin name="get_custom_delivery_date_attribute" type="PavelIvankov\CustomDeliveryDate\Plugin\OrderGet"/>
     </type>
+    <virtualType name="Magento\Sales\Model\ResourceModel\Order\Grid">
+        <arguments>
+            <argument name="joins" xsi:type="array">
+                <item name="order" xsi:type="array">
+                    <item name="table" xsi:type="string">sales_order</item>
+                    <item name="origin_column" xsi:type="string">entity_id</item>
+                    <item name="target_column" xsi:type="string">entity_id</item>
+                </item>
+            </argument>
+            <argument name="columns" xsi:type="array">
+                <item name="custom_delivery_date" xsi:type="string">order.custom_delivery_date</item>
+            </argument>
+        </arguments>
+    </virtualType>
 </config>

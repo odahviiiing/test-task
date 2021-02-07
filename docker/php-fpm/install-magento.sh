@@ -109,9 +109,4 @@ if [ -z "$(ls -A /var/www/magento)" ]; then
   if [[ "${MAGENTO_REDIS_SES_SERVER}" ]]; then
     /var/www/configure-redis-ses.sh
   fi
-
-  echo "Running Sample Data Deploy"
-  /var/www/magento/bin/magento sampledata:deploy
-  echo "Running setup:upgrade"
-  /var/www/magento/bin/magento setup:upgrade
 fi

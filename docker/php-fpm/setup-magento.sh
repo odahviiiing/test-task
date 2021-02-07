@@ -1,4 +1,7 @@
 #!/bin/bash
+echo "Installing packages with composer."
+composer install -vv
+
 install_args=()
 if [[ "${MAGENTO_ADMIN_FIRSTNAME}" ]]; then
   install_args+=("--admin-firstname=$MAGENTO_ADMIN_FIRSTNAME")
@@ -106,5 +109,7 @@ if [[ "${MAGENTO_REDIS_SES_SERVER}" ]]; then
   /var/www/configure-redis-ses.sh
 fi
 
+echo "Running Sample Data Deploy"
+/var/www/magento/bin/magento sampledata:deploy
 echo "Running setup:upgrade"
 /var/www/magento/bin/magento setup:upgrade
