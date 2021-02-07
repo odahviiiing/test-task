@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Installing packages with composer."
-composer install -vv
+composer update -vv
 
 install_args=()
 if [[ "${MAGENTO_ADMIN_FIRSTNAME}" ]]; then

@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y \
 COPY *.sh /var/www/
 RUN chown www-data:www-data /var/www/*.sh && chmod +x /var/www/*.sh
 RUN mkdir /var/www/.composer && chown www-data:www-data /var/www/.composer
-#RUN chown -R www-data:www-data /var/www
+RUN chown -R www-data:www-data /var/www
 #
 USER www-data
 
