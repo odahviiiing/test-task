@@ -1,0 +1,99 @@
+version: '3'
+services:
+  nginx:
+    build:
+      args:
+        nginx_port: 80
+        nginx_version: ${NGINX_VERSION}
+        nginx_vhost_name: ${NGINX_VHOST_NAME}
+      context: ./docker/nginx
+    container_name: test-task-nginx
+    depends_on:
+      - php-fpm
+    volumes:
+      - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf:cached
+      - ./src/magento:/var/www/magento:cached
+    networks:
+      - 'test-task'
+
+  php-fpm:
+    build:
+      args:
+        php_version: ${PHP_VERSION}
+      context: ./docker/php-fpm
+    env_file:
+      - .env
+    container_name: test-task-php-fpm
+    depends_on:
+      - cron
+      - mysql
+#      - redis-fpc
+#      - redis-obj
+#      - redis-ses
+    volumes:
+      - ./src/magento:/var/www/magento:cached
+      - ./config/composer/auth.json:/var/www/.composer/auth.json:cached
+      - ./config/composer/auth.json:/var/www/magento/auth.json:cached
+      - ./config/php/php.ini:/usr/local/etc/php/php.ini:cached
+    networks:
+      - 'test-task'
+  cron:
+    build:
+      args:
+        php_version: ${PHP_VERSION}
+      context: ./docker/cron
+    container_name: test-task-cron
+    volumes:
+      - ./src/magento:/var/www/magento:cached
+      - ./config/php/php.ini:/usr/local/etc/php/php.ini:cached
+    networks:
+      - 'test-task'
+  mysql:
+    container_name: test-task-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    image: percona:${MYSQL_VERSION}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-log:/var/log/mysql
+      - mysql-lib:/var/lib/mysql
+      - ./src/magento:/var/www/magento:cached
+      - ./config/mysql/config.cnf:/etc/my.cnf.d/config.cnf
+    networks:
+      - 'test-task'
+
+#  redis-obj:
+#    image: redis:${REDIS_VERSION}
+#    ports:
+#      - "6379:6379"
+#    networks:
+#      - 'test-task'
+#  redis-fpc:
+#    command: redis-server /usr/local/etc/redis/redis.conf
+#    image: redis:${REDIS_VERSION}
+#    ports:
+#      - "6380:6380"
+#    volumes:
+#      - ./config/redis/fpc.conf:/usr/local/etc/redis/redis.conf
+#    networks:
+#      - 'test-task'
+#  redis-ses:
+#    command: redis-server /usr/local/etc/redis/redis.conf
+#    image: redis:${REDIS_VERSION}
+#    ports:
+#      - "6381:6381"
+#    volumes:
+#      - ./config/redis/ses.conf:/usr/local/etc/redis/redis.conf
+#    networks:
+#      - 'test-task'
+
+volumes:
+  mysql-log:
+  mysql-lib:
+
+networks:
+  test-task:
